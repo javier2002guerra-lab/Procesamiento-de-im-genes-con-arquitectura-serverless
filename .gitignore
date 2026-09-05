@@ -1,0 +1,30 @@
+# Dependencias y compilación
+node_modules/
+dist/
+
+# Paquetes y directorios temporales de despliegue
+*.zip
+.lambda-package/
+.tmp/
+tmp/
+temp/
+
+# Variables locales y credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials
+.aws/
+
+# Logs, cobertura y archivos del sistema/editor
+*.log
+coverage/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+~$*
