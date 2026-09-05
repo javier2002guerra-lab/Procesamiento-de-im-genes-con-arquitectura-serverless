@@ -11,6 +11,8 @@
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "clean": "tsc -b --clean",
+    "evidence:images": "node ./scripts/generate-evidence-images.mjs",
+    "evidence:report": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-simulated-report.ps1",
     "package:lambda": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/package-lambda.ps1"
   },
   "keywords": [

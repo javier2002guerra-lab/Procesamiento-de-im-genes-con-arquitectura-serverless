@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Informe académico - Procesamiento de imágenes serverless</title>
+  <style>
+    @page { size: A4; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; background:#d9dee5; color:#182230; font-family:Arial,"Segoe UI",sans-serif; }
+    .page { width:210mm; min-height:297mm; margin:0 auto; padding:18mm 19mm 17mm; background:white; position:relative; page-break-after:always; overflow:hidden; }
+    .page:last-child { page-break-after:auto; }
+    .cover { display:flex; flex-direction:column; justify-content:center; color:white; background:linear-gradient(145deg,#0b172a 0%,#173f6b 58%,#057a8d 100%); }
+    .cover:after { content:""; position:absolute; width:175mm; height:175mm; border:2px solid #ffffff22; border-radius:50%; right:-75mm; top:-55mm; box-shadow:0 0 0 18mm #ffffff0a,0 0 0 38mm #ffffff08; }
+    .kicker { text-transform:uppercase; letter-spacing:2.5px; color:#67e8f9; font-weight:700; font-size:11pt; }
+    .cover h1 { margin:8mm 0 5mm; color:white; font-size:33pt; line-height:1.1; max-width:160mm; }
+    .cover .subtitle { max-width:155mm; font-size:15pt; line-height:1.45; color:#dbeafe; }
+    .cover-card { margin-top:20mm; width:145mm; padding:8mm; background:#ffffff12; border:1px solid #ffffff35; border-radius:5mm; line-height:1.75; }
+    .disclaimer { border:2px solid #b42318; background:#fff3f2; border-radius:4mm; padding:8mm; margin:8mm 0; }
+    .disclaimer h2 { color:#b42318; margin-top:0; }
+    .tag { display:inline-block; border-radius:20px; padding:2.2mm 4mm; font-size:8.5pt; font-weight:800; letter-spacing:.5px; background:#fee4e2; color:#b42318; }
+    .header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #d5dbe3; padding-bottom:4mm; margin-bottom:8mm; color:#516173; font-size:8.5pt; }
+    .header b { color:#0e7490; }
+    .footer { position:absolute; left:19mm; right:19mm; bottom:8mm; display:flex; justify-content:space-between; border-top:1px solid #e3e7ec; padding-top:3mm; color:#6b7280; font-size:8pt; }
+    h1 { margin:0 0 6mm; color:#0f3156; font-size:25pt; line-height:1.15; }
+    h2 { color:#0e5f7d; font-size:17pt; margin:7mm 0 3mm; }
+    h3 { color:#193b62; font-size:12.5pt; margin:5mm 0 2mm; }
+    p, li { font-size:10.5pt; line-height:1.55; }
+    p { margin:0 0 3.5mm; }
+    ul,ol { margin:2mm 0 4mm 6mm; padding-left:5mm; }
+    li { margin-bottom:1.7mm; }
+    .lead { font-size:13pt; color:#41576d; line-height:1.5; }
+    .callout { border-left:4px solid #0891b2; background:#ecfeff; padding:4mm 5mm; margin:5mm 0; }
+    .warning { border-left-color:#b42318; background:#fff3f2; }
+    .success { border-left-color:#15803d; background:#f0fdf4; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+    .card { border:1px solid #d5dbe3; border-radius:3mm; padding:5mm; background:#fbfcfd; }
+    .card h3 { margin-top:0; }
+    table { width:100%; border-collapse:collapse; margin:4mm 0; font-size:9.2pt; }
+    th { background:#12395e; color:white; text-align:left; padding:2.8mm; }
+    td { border:1px solid #d5dbe3; padding:2.6mm; vertical-align:top; line-height:1.35; }
+    tr:nth-child(even) td { background:#f6f8fa; }
+    code { font-family:Consolas,monospace; color:#9f1239; background:#fff1f2; padding:.3mm 1mm; border-radius:1mm; }
+    pre { white-space:pre-wrap; font:8.6pt/1.45 Consolas,monospace; color:#dceafa; background:#101c2b; padding:5mm; border-radius:3mm; margin:4mm 0; }
+    .flow { display:flex; align-items:center; justify-content:center; gap:2mm; margin:7mm 0; }
+    .flow .node { width:31mm; min-height:28mm; border:1.5px solid #0e7490; border-radius:3mm; padding:4mm 2mm; text-align:center; font-weight:700; background:#ecfeff; display:flex; flex-direction:column; justify-content:center; font-size:9pt; }
+    .flow .node small { font-weight:400; margin-top:1mm; }
+    .flow .arrow { color:#f59e0b; font-size:20pt; font-weight:bold; }
+    .metric { text-align:center; padding:5mm; border-radius:3mm; background:#edf7ff; border:1px solid #b6dcf7; }
+    .metric strong { display:block; color:#075985; font-size:20pt; margin-bottom:1mm; }
+    .evidence-page h1 { font-size:21pt; margin-bottom:3mm; }
+    .shot { width:100%; max-height:174mm; object-fit:contain; border:1px solid #98a3b2; box-shadow:0 2mm 6mm #0002; margin:3mm 0 5mm; }
+    .caption { border-left:4px solid #0e7490; background:#f0f9ff; padding:4mm 5mm; }
+    .caption p { margin:0; font-size:9.8pt; }
+    .mini { font-size:8.8pt; color:#5d6978; }
+    .toc { columns:2; column-gap:12mm; }
+    .toc div { break-inside:avoid; display:flex; justify-content:space-between; border-bottom:1px dotted #9aa5b1; padding:2.3mm 0; font-size:10pt; }
+    a { color:#075985; text-decoration:none; }
+    .check { color:#15803d; font-weight:700; }
+    @media print { html,body { background:white; } .page { margin:0; } }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="kicker">Proyecto académico · Arquitectura serverless</div>
+    <h1>Procesamiento automático de imágenes en AWS</h1>
+    <div class="subtitle">Diseño orientado a eventos con Amazon S3, AWS Lambda, TypeScript, Node.js y Sharp</div>
+    <div class="cover-card">
+      <b>Universidad:</b> Universidad Mariano Gálvez de Guatemala<br>
+      <b>Estudiante:</b> Javier Guerra<br>
+      <b>Carné:</b> [COMPLETAR]<br>
+      <b>Curso:</b> [COMPLETAR]<br>
+      <b>Docente:</b> [COMPLETAR]<br>
+      <b>Fecha:</b> 4 de septiembre de 2026
+    </div>
+    <div style="margin-top:16mm"><span class="tag">INFORME CON EVIDENCIAS SIMULADAS</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>Declaración de alcance</b><span>Proyecto serverless</span></div>
+    <h1>Nota obligatoria sobre las evidencias</h1>
+    <div class="disclaimer">
+      <h2>Simulación académica — sin ejecución en AWS</h2>
+      <p>Las capturas de Amazon S3, AWS Lambda, IAM y CloudWatch incluidas en este documento son recreaciones visuales. No fueron obtenidas desde una cuenta AWS activa y no deben presentarse como prueba de un despliegue real.</p>
+    </div>
+    <p class="lead">La cuenta AWS no pudo recuperarse. Para mantener la utilidad técnica del entregable se separaron cuidadosamente dos tipos de evidencia:</p>
+    <div class="grid2">
+      <div class="card"><h3>Validación real local</h3><p>El código TypeScript compiló correctamente. Sharp procesó archivos JPEG y PNG reales en la computadora y se verificaron formato, dimensiones y tamaño.</p></div>
+      <div class="card"><h3>Infraestructura simulada</h3><p>Las pantallas de S3, Lambda, IAM y CloudWatch representan cómo se vería una configuración correcta usando nombres y mensajes coherentes con el proyecto.</p></div>
+    </div>
+    <h2>Cómo sustituir esta simulación</h2>
+    <p>Cuando exista acceso a AWS, se debe seguir el README, desplegar el ZIP, repetir la prueba y reemplazar las capturas 2 a 12 por imágenes reales de la consola. Las capturas 1, 13, 14, 15 y 16 ya reflejan archivos procesados realmente por Sharp en el entorno local.</p>
+    <div class="callout warning"><b>Integridad académica:</b> todas las recreaciones poseen una marca visible “SIMULACIÓN ACADÉMICA · SIN AWS REAL”.</div>
+    <div class="footer"><span>Javier Guerra</span><span>Declaración de alcance</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>Contenido</b><span>Informe académico</span></div>
+    <h1>Índice</h1>
+    <div class="toc">
+      <div><span>1. Introducción</span><span>4</span></div>
+      <div><span>2. Objetivos</span><span>4</span></div>
+      <div><span>3. Arquitectura propuesta</span><span>5</span></div>
+      <div><span>4. Recursos utilizados</span><span>6</span></div>
+      <div><span>5. Implementación</span><span>7</span></div>
+      <div><span>6. Configuración AWS propuesta</span><span>8</span></div>
+      <div><span>7. Dimensiones y Sharp</span><span>9</span></div>
+      <div><span>8. Permisos y seguridad</span><span>10</span></div>
+      <div><span>9. Logs y observabilidad</span><span>11</span></div>
+      <div><span>10. Pruebas y resultados</span><span>12</span></div>
+      <div><span>11. Ciclos e idempotencia</span><span>13</span></div>
+      <div><span>12. Conclusiones</span><span>14</span></div>
+      <div><span>13. Repositorio y referencias</span><span>14</span></div>
+      <div><span>Anexo: 16 evidencias</span><span>15–30</span></div>
+    </div>
+    <h2>Resumen ejecutivo</h2>
+    <p>Se desarrolló una función en TypeScript que recibe eventos de Amazon S3, decodifica las keys, limita el procesamiento al prefijo <code>originals/</code>, descarga JPEG o PNG con AWS SDK v3, redimensiona con Sharp y guarda un objeto relacionado en <code>resized/</code>. El nombre determinista hace segura la repetición del evento.</p>
+    <p>La compilación local, la auditoría de dependencias y el procesamiento de imágenes fueron ejecutados realmente. La configuración cloud se documentó y se representó mediante capturas simuladas debido a la indisponibilidad de la cuenta AWS.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Índice y resumen</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>1–2</b><span>Introducción y objetivos</span></div>
+    <h1>Introducción</h1>
+    <p>El procesamiento manual de imágenes requiere intervención humana, consume tiempo y dificulta mantener dimensiones uniformes. Una arquitectura orientada a eventos permite reaccionar inmediatamente a una carga y ejecutar una transformación sin mantener servidores encendidos.</p>
+    <p>Amazon S3 actúa como almacenamiento y productor del evento; AWS Lambda aporta cómputo bajo demanda; Sharp realiza la transformación; IAM controla permisos; y CloudWatch centraliza logs. TypeScript facilita una implementación modular, legible y con validación estática.</p>
+    <h2>Objetivo general</h2>
+    <p>Diseñar e implementar una solución serverless que redimensione automáticamente imágenes JPEG y PNG al almacenarlas en el prefijo <code>originals/</code> de un bucket S3, preservando el original y guardando el resultado en <code>resized/</code>.</p>
+    <h2>Objetivos específicos</h2>
+    <ul>
+      <li>Procesar todos los registros contenidos en un evento S3.</li>
+      <li>Obtener dimensiones desde <code>IMAGE_WIDTH</code> y <code>IMAGE_HEIGHT</code>.</li>
+      <li>Conservar el tipo JPEG o PNG y un <code>Content-Type</code> correcto.</li>
+      <li>Evitar ciclos mediante filtro de infraestructura y validación defensiva.</li>
+      <li>Aplicar mínimo privilegio para lectura, escritura y logs.</li>
+      <li>Producir salidas idempotentes y observables.</li>
+    </ul>
+    <div class="callout"><b>Alcance:</b> el entregable incluye código, política IAM, empaquetado Linux x64, documentación y pruebas locales reales.</div>
+    <div class="footer"><span>Javier Guerra</span><span>Introducción y objetivos</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>3</b><span>Arquitectura propuesta</span></div>
+    <h1>Arquitectura orientada a eventos</h1>
+    <div class="flow">
+      <div class="node">Usuario<small>Carga JPEG/PNG</small></div><div class="arrow">›</div>
+      <div class="node">S3 originals/<small>s3:ObjectCreated:*</small></div><div class="arrow">›</div>
+      <div class="node">AWS Lambda<small>Node.js 22.x</small></div><div class="arrow">›</div>
+      <div class="node">Sharp<small>fit: inside</small></div><div class="arrow">›</div>
+      <div class="node">S3 resized/<small>Resultado</small></div>
+    </div>
+    <h2>Secuencia</h2>
+    <ol>
+      <li>El usuario carga un objeto dentro de <code>originals/</code>.</li>
+      <li>S3 emite <code>s3:ObjectCreated:*</code> únicamente si la key coincide con ese prefijo.</li>
+      <li>Lambda identifica bucket y key, decodifica caracteres y valida extensión.</li>
+      <li><code>GetObject</code> descarga el archivo a memoria.</li>
+      <li>Sharp comprueba el formato real, auto-orienta y redimensiona sin deformar.</li>
+      <li><code>PutObject</code> guarda una key determinista en <code>resized/</code>.</li>
+      <li>Los mensajes de ejecución se escriben en CloudWatch Logs.</li>
+    </ol>
+    <h2>Separación de responsabilidades</h2>
+    <div class="grid3">
+      <div class="card"><h3>Evento</h3><p>S3 detecta una creación y entrega uno o más registros.</p></div>
+      <div class="card"><h3>Proceso</h3><p>Lambda y Sharp transforman buffers sin modificar la entrada.</p></div>
+      <div class="card"><h3>Observación</h3><p>CloudWatch permite diagnosticar formato, dimensiones y errores.</p></div>
+    </div>
+    <div class="footer"><span>Javier Guerra</span><span>Arquitectura</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>4</b><span>Recursos utilizados</span></div>
+    <h1>Tecnologías y responsabilidades</h1>
+    <table>
+      <tr><th>Recurso</th><th>Uso dentro de la solución</th><th>Configuración principal</th></tr>
+      <tr><td>Amazon S3</td><td>Conserva entrada y salida como objetos privados.</td><td><code>originals/</code> y <code>resized/</code></td></tr>
+      <tr><td>AWS Lambda</td><td>Ejecuta el handler cuando S3 publica el evento.</td><td>Node.js 22.x, x86_64, 1024 MB, 30 s</td></tr>
+      <tr><td>Sharp 0.35.4</td><td>Lee metadata, auto-orienta y redimensiona.</td><td>Linux x64 + glibc</td></tr>
+      <tr><td>AWS SDK v3</td><td>Implementa <code>GetObject</code> y <code>PutObject</code>.</td><td><code>@aws-sdk/client-s3</code></td></tr>
+      <tr><td>IAM</td><td>Limita acceso por acción y prefijo.</td><td>Rol de ejecución de Lambda</td></tr>
+      <tr><td>CloudWatch Logs</td><td>Registra inicio, descarga, resize, guardado y errores.</td><td><code>/aws/lambda/umg-image-resizer</code></td></tr>
+      <tr><td>TypeScript 7</td><td>Tipado estricto y compilación a JavaScript.</td><td>Target ES2022, Node16 modules</td></tr>
+      <tr><td>GitHub</td><td>Control de versiones y entrega.</td><td>Rama <code>main</code></td></tr>
+    </table>
+    <h2>Estructura modular</h2>
+    <pre>src/
+├── index.ts           # Orquestación, lotes, logs y errores
+├── config.ts          # Variables de entorno
+├── imageProcessor.ts  # Sharp y validación del formato real
+├── s3Service.ts       # AWS SDK v3
+└── utils.ts           # Prefijos, keys y Content-Type</pre>
+    <div class="footer"><span>Javier Guerra</span><span>Recursos</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>5</b><span>Implementación</span></div>
+    <h1>Implementación de la función</h1>
+    <p>El handler recorre secuencialmente <code>event.Records</code>. Si un registro falla, el error se conserva y se continúa con los demás. Al final se lanza un <code>AggregateError</code> para que una invocación parcialmente fallida no aparente éxito.</p>
+    <pre>export async function handler(event: S3Event): Promise&lt;void&gt; {
+  const results: RecordResult[] = [];
+  const failures: Error[] = [];
+
+  for (const [index, record] of event.Records.entries()) {
+    try {
+      results.push(await processRecord(record, index + 1));
+    } catch (error: unknown) {
+      console.error("Error al procesar registro S3.", ...);
+      failures.push(error instanceof Error ? error : new Error(String(error)));
+    }
+  }
+
+  if (failures.length &gt; 0) throw new AggregateError(failures);
+}</pre>
+    <h2>Construcción de la salida</h2>
+    <p><code>originals/viaje/Foto.JPEG</code> se transforma determinísticamente en <code>resized/viaje/Foto-resized.jpeg</code>. No se usan fechas ni identificadores aleatorios.</p>
+    <h2>Validaciones</h2>
+    <ul>
+      <li>Decodificación de <code>+</code> y caracteres URL-encoded.</li>
+      <li>Prefijo obligatorio <code>originals/</code>.</li>
+      <li>Extensiones <code>.jpg</code>, <code>.jpeg</code> y <code>.png</code>.</li>
+      <li>Comparación entre extensión y formato binario detectado por Sharp.</li>
+      <li>Dimensiones enteras, positivas y menores o iguales a 10 000.</li>
+    </ul>
+    <div class="footer"><span>Javier Guerra</span><span>Implementación</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>6</b><span>Configuración AWS propuesta</span></div>
+    <h1>Configuración de infraestructura</h1>
+    <div class="callout warning"><b>Estado:</b> esta configuración se documenta y simula; no fue aplicada a una cuenta AWS.</div>
+    <h2>Amazon S3</h2>
+    <ul>
+      <li>Bucket de ejemplo: <code>umg-serverless-images-demo-jguerra</code>.</li>
+      <li>Región: <code>us-east-1</code>.</li>
+      <li>Block Public Access activado.</li>
+      <li>Prefijos: <code>originals/</code> y <code>resized/</code>.</li>
+    </ul>
+    <h2>AWS Lambda</h2>
+    <table>
+      <tr><th>Propiedad</th><th>Valor propuesto</th><th>Justificación</th></tr>
+      <tr><td>Nombre</td><td>umg-image-resizer</td><td>Identifica claramente su responsabilidad.</td></tr>
+      <tr><td>Runtime</td><td>Node.js 22.x</td><td>Compatible con TypeScript compilado y Sharp.</td></tr>
+      <tr><td>Arquitectura</td><td>x86_64</td><td>Coincide con los binarios del ZIP.</td></tr>
+      <tr><td>Memoria</td><td>1024 MB</td><td>Valor inicial razonable para imágenes moderadas.</td></tr>
+      <tr><td>Timeout</td><td>30 segundos</td><td>Margen para descarga, proceso y carga.</td></tr>
+      <tr><td>Handler</td><td>index.handler</td><td>Exportación compilada en la raíz del ZIP.</td></tr>
+    </table>
+    <h2>Trigger</h2>
+    <p><b>Event type:</b> All object create events. <b>Prefix:</b> <code>originals/</code>. <b>Suffix:</b> vacío para admitir JPEG y PNG.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Configuración propuesta</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>7</b><span>Procesamiento de imágenes</span></div>
+    <h1>Dimensiones y Sharp</h1>
+    <pre>const pipeline = sharp(input, { failOn: "error" })
+  .rotate()
+  .resize({
+    width: dimensions.width,
+    height: dimensions.height,
+    fit: "inside",
+    withoutEnlargement: true,
+  });</pre>
+    <p><code>fit: "inside"</code> coloca la imagen dentro del rectángulo 800 × 600 sin recortar ni deformar. <code>withoutEnlargement</code> evita ampliar entradas pequeñas. <code>rotate()</code> aplica la orientación EXIF antes del resize.</p>
+    <h2>Resultados medidos localmente</h2>
+    <div class="grid2">
+      <div class="metric"><strong>1600×900</strong>JPEG original<br>82 831 bytes</div>
+      <div class="metric"><strong>800×450</strong>JPEG procesado<br>21 041 bytes</div>
+      <div class="metric"><strong>1200×1600</strong>PNG original<br>76 423 bytes</div>
+      <div class="metric"><strong>450×600</strong>PNG procesado<br>31 214 bytes</div>
+    </div>
+    <p class="mini">Las cifras corresponden a una ejecución local real de la misma estrategia Sharp. Los tamaños pueden variar ligeramente si cambia la versión o configuración del codificador.</p>
+    <h2>Empaquetado para Lambda</h2>
+    <p>El comando <code>npm run package:lambda</code> instala dependencias de producción con <code>--os=linux --cpu=x64 --libc=glibc</code>. El ZIP verificado contiene <code>sharp-linux-x64</code>, libvips y <code>index.js</code> en la raíz.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Sharp y dimensiones</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>8</b><span>Permisos y seguridad</span></div>
+    <h1>IAM de mínimo privilegio</h1>
+    <pre>{
+  "Effect": "Allow",
+  "Action": "s3:GetObject",
+  "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/originals/*"
+},
+{
+  "Effect": "Allow",
+  "Action": "s3:PutObject",
+  "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/resized/*"
+}</pre>
+    <h2>Controles aplicados</h2>
+    <ul>
+      <li>No se concede <code>s3:*</code>, borrado, administración ni lectura de otros prefijos.</li>
+      <li>El bucket debe permanecer privado con bloqueo de acceso público.</li>
+      <li>Lambda obtiene credenciales temporales a través de su execution role.</li>
+      <li>Las claves de acceso, contraseñas y tokens no aparecen en el repositorio.</li>
+      <li>Los permisos de logs se limitan al grupo de la función, excepto la creación inicial del grupo.</li>
+      <li>La validación binaria reduce el riesgo de procesar un archivo disfrazado.</li>
+    </ul>
+    <div class="callout success"><b>Auditoría local:</b> la política JSON fue validada y no contiene acciones administrativas con comodín.</div>
+    <h2>Consideraciones de producción</h2>
+    <p>Para una solución pública también serían necesarios límites de tamaño, alarmas, presupuesto, retención de objetos y, si se utiliza una clave KMS propia, permisos KMS restringidos a esa clave.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Seguridad</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>9</b><span>Logs y observabilidad</span></div>
+    <h1>Registro de la ejecución</h1>
+    <p>El código emite logs estructurados con contexto suficiente para seguir cada registro sin imprimir el contenido del archivo o credenciales.</p>
+    <table>
+      <tr><th>Momento</th><th>Información registrada</th></tr>
+      <tr><td>Inicio</td><td>Número de registros recibidos.</td></tr>
+      <tr><td>Evento</td><td>Bucket, key decodificada y nombre del evento.</td></tr>
+      <tr><td>Configuración</td><td>Content-Type esperado, ancho, alto y key de salida.</td></tr>
+      <tr><td>Descarga</td><td>Confirmación, bytes y Content-Type declarado por S3.</td></tr>
+      <tr><td>Sharp</td><td>Formato detectado, dimensiones iniciales/finales y bytes.</td></tr>
+      <tr><td>Guardado</td><td>Bucket, key final y Content-Type almacenado.</td></tr>
+      <tr><td>Error</td><td>Nombre, mensaje y stack para diagnóstico.</td></tr>
+    </table>
+    <h2>Interpretación de la captura simulada</h2>
+    <p>La captura 11 reproduce exactamente la secuencia y nombres de campos programados. Los valores 1600×900, 800×450, 82 831 y 21 041 bytes proceden de la prueba local real; timestamp, RequestId y presentación de CloudWatch son simulados.</p>
+    <div class="callout warning"><b>No es un log real de CloudWatch.</b> Sirve para explicar qué se espera observar al desplegar.</div>
+    <div class="footer"><span>Javier Guerra</span><span>Observabilidad</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>10</b><span>Pruebas y resultados</span></div>
+    <h1>Pruebas ejecutadas</h1>
+    <table>
+      <tr><th>Prueba</th><th>Entrada</th><th>Resultado</th><th>Estado</th></tr>
+      <tr><td>Compilación</td><td>TypeScript estricto</td><td>Sin errores ni variables sin utilizar</td><td class="check">Correcto</td></tr>
+      <tr><td>Dependencias</td><td><code>npm audit --omit=dev</code></td><td>0 vulnerabilidades reportadas</td><td class="check">Correcto</td></tr>
+      <tr><td>JPEG</td><td>1600×900, image/jpeg</td><td>800×450, image/jpeg</td><td class="check">Correcto</td></tr>
+      <tr><td>PNG</td><td>1200×1600, image/png</td><td>450×600, image/png</td><td class="check">Correcto</td></tr>
+      <tr><td>Decodificación</td><td><code>mi+foto.jpg</code></td><td><code>mi foto.jpg</code></td><td class="check">Correcto</td></tr>
+      <tr><td>Salida anidada</td><td><code>originals/viaje/Foto.JPEG</code></td><td><code>resized/viaje/Foto-resized.jpeg</code></td><td class="check">Correcto</td></tr>
+      <tr><td>Paquete Lambda</td><td>ZIP Linux x64</td><td>Binario Sharp y libvips presentes</td><td class="check">Correcto</td></tr>
+      <tr><td>Integración AWS</td><td>S3 → Lambda → S3</td><td>No ejecutada por falta de acceso</td><td>Simulada</td></tr>
+    </table>
+    <h2>Conclusión de las pruebas</h2>
+    <p>El núcleo de procesamiento y el artefacto de despliegue quedaron validados localmente. La ejecución integral en servicios AWS sigue pendiente y debe realizarse antes de afirmar que el sistema fue desplegado en la nube.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Pruebas</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>11</b><span>Prevención de ciclos e idempotencia</span></div>
+    <h1>Controles de consistencia</h1>
+    <h2>Prevención de ciclos</h2>
+    <div class="grid2">
+      <div class="card"><h3>1. Filtro del trigger</h3><p>S3 solo invoca Lambda por keys que comienzan con <code>originals/</code>. La salida se escribe en otro prefijo.</p></div>
+      <div class="card"><h3>2. Defensa en código</h3><p>El handler vuelve a comprobar el prefijo y termina el registro si recibe una key de <code>resized/</code> u otra ubicación.</p></div>
+    </div>
+    <div class="flow"><div class="node">originals/foto.jpg</div><div class="arrow">›</div><div class="node">Lambda + Sharp</div><div class="arrow">›</div><div class="node">resized/foto-resized.jpg</div><div class="arrow">×</div><div class="node">Sin nueva invocación</div></div>
+    <h2>Idempotencia</h2>
+    <p>S3 puede entregar una notificación más de una vez. El mismo archivo siempre genera la misma key. Una repetición sobrescribe de forma segura el resultado anterior en vez de crear copias numeradas o nombres aleatorios.</p>
+    <pre>originals/foto.jpg
+        ↓
+resized/foto-resized.jpg  // siempre la misma salida</pre>
+    <p>En una solución con control estricto del costo podrían registrarse key y eTag en DynamoDB con escritura condicional. Para el alcance académico, la sobrescritura determinista satisface la consistencia requerida.</p>
+    <div class="footer"><span>Javier Guerra</span><span>Ciclos e idempotencia</span></div>
+  </section>
+
+  <section class="page">
+    <div class="header"><b>12–13</b><span>Conclusiones y referencias</span></div>
+    <h1>Conclusiones</h1>
+    <ol>
+      <li>Una arquitectura basada en eventos desacopla la carga de la imagen de su transformación y elimina la necesidad de invocar manualmente el proceso.</li>
+      <li>Separar <code>originals/</code> y <code>resized/</code>, junto con una validación defensiva, evita ciclos de invocación.</li>
+      <li>Sharp conserva proporción y formato, pero sus binarios deben empaquetarse para el sistema operativo y arquitectura de Lambda.</li>
+      <li>Los nombres deterministas hacen que la entrega repetida de eventos produzca un estado consistente.</li>
+      <li>IAM y CloudWatch son parte funcional de la solución: reducen exposición y facilitan diagnóstico.</li>
+    </ol>
+    <h2>Repositorio</h2>
+    <p><a href="https://github.com/javier2002guerra-lab/Procesamiento-de-im-genes-con-arquitectura-serverless">github.com/javier2002guerra-lab/Procesamiento-de-im-genes-con-arquitectura-serverless</a></p>
+    <h2>Referencias oficiales</h2>
+    <ul class="mini">
+      <li>AWS. <i>Process Amazon S3 event notifications with Lambda.</i> https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html</li>
+      <li>AWS. <i>Building Lambda functions with Node.js.</i> https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html</li>
+      <li>AWS. <i>Enabling and configuring event notifications using the Amazon S3 console.</i> https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-event-notifications.html</li>
+      <li>AWS. <i>Viewing CloudWatch logs for Lambda functions.</i> https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html</li>
+      <li>Sharp. <i>Installation — AWS Lambda.</i> https://sharp.pixelplumbing.com/install/#aws-lambda</li>
+    </ul>
+    <div class="callout"><b>Trabajo futuro:</b> reemplazar las evidencias simuladas por capturas de una cuenta académica AWS y registrar métricas reales de duración y consumo.</div>
+    <div class="footer"><span>Javier Guerra</span><span>Conclusiones</span></div>
+  </section>
+
+  <div id="evidence-pages"></div>
+  <script>
+    const evidence = [
+      ['Imagen original y dimensiones','Archivo JPEG generado para una prueba reproducible. La imagen y sus dimensiones 1600×900 son reales y se verificaron localmente.'],
+      ['Bucket S3','Recreación del bucket privado en us-east-1. Demuestra el nombre, región y bloqueo de acceso público esperados.'],
+      ['Prefijos originals/ y resized/','Representación de los dos prefijos. originals/ recibe entradas y resized/ conserva resultados.'],
+      ['Carga dentro de originals/','Simulación del objeto creado en originals/. En AWS real esta operación generaría s3:ObjectCreated:*.'],
+      ['Función AWS Lambda','Recreación del resumen de umg-image-resizer con runtime, arquitectura, memoria, timeout y handler.'],
+      ['Trigger de Amazon S3','Configuración simulada de All object create events y destino Lambda.'],
+      ['Filtro prefix originals/','El prefijo con barra final constituye la barrera principal contra invocaciones por resized/.'],
+      ['Variables de entorno','IMAGE_WIDTH=800 e IMAGE_HEIGHT=600 mantienen las dimensiones fuera del código.'],
+      ['Rol IAM','Recreación del execution role que Lambda asumiría mediante lambda.amazonaws.com.'],
+      ['Política IAM','Política simulada con GetObject en originals/*, PutObject en resized/* y permisos de logs.'],
+      ['CloudWatch Logs','Log completamente simulado en apariencia y tiempo. Los nombres de mensajes coinciden con el código; dimensiones y bytes proceden de la ejecución local real.'],
+      ['Resultado en resized/','Representación de la key determinista prueba-serverless-resized.jpg.'],
+      ['Imagen procesada','Salida JPEG producida realmente por Sharp en la computadora, con 800×450 y Content-Type esperado image/jpeg.'],
+      ['Dimensiones originales','Propiedades verificadas de la entrada real: 1600×900, relación 16:9.'],
+      ['Dimensiones nuevas','Propiedades verificadas del resultado real: 800×450, relación 16:9.'],
+      ['Comparación final','Comparación real local. Sharp redujo ambas dimensiones 50 %, conservó la proporción y mantuvo el original separado.']
+    ];
+    const target = document.getElementById('evidence-pages');
+    evidence.forEach((item,index) => {
+      const number = String(index + 1).padStart(2,'0');
+      target.insertAdjacentHTML('beforeend', `<section class="page evidence-page"><div class="header"><b>Anexo de evidencias</b><span>Captura ${index+1} de 16</span></div><span class="tag">SIMULACIÓN DECLARADA</span><h1>Captura ${index+1}: ${item[0]}</h1><img class="shot" src="../evidence/screenshots/captura-${number}.png"><div class="caption"><p><b>Explicación:</b> ${item[1]}</p></div><p class="mini" style="margin-top:4mm">La marca roja dentro de la imagen identifica las pantallas simuladas y evita confundirlas con evidencia de una cuenta AWS activa.</p><div class="footer"><span>Javier Guerra</span><span>Evidencia ${index+1}</span></div></section>`);
+    });
+  </script>
+</body>
+</html>

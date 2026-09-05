@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evidencia simulada</title>
+  <style>
+    :root { --nav:#131a22; --ink:#161e2d; --muted:#5f6b7a; --line:#d5dbdb; --blue:#0972d3; --orange:#ff9900; --green:#037f0c; --soft:#f2f3f3; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; width:100%; height:100%; overflow:hidden; font-family:Arial,"Segoe UI",sans-serif; color:var(--ink); background:white; }
+    .watermark { position:fixed; z-index:50; right:18px; top:68px; padding:8px 13px; border:2px solid #b42318; background:#fff1f0; color:#b42318; border-radius:6px; font-size:13px; font-weight:800; letter-spacing:.45px; box-shadow:0 1px 4px #0002; }
+    .top { height:56px; background:var(--nav); color:white; display:flex; align-items:center; gap:22px; padding:0 24px; }
+    .aws { font-size:25px; font-weight:800; letter-spacing:1px; color:white; }
+    .aws i { display:block; height:3px; width:37px; margin:-2px 0 0 5px; background:var(--orange); border-radius:50%; transform:rotate(-5deg); }
+    .services { font-weight:700; }
+    .search { flex:1; max-width:560px; padding:10px 14px; background:white; border-radius:4px; color:#687078; }
+    .region,.account { font-size:13px; }
+    .subnav { height:43px; background:#232f3e; color:white; display:flex; align-items:center; gap:25px; padding:0 28px; font-size:14px; }
+    .layout { height:calc(100% - 99px); display:flex; }
+    .side { width:224px; background:#f7f8f8; border-right:1px solid var(--line); padding:22px 15px; }
+    .side h3 { margin:0 0 18px; font-size:16px; }
+    .side div { padding:10px 12px; margin:2px 0; border-radius:4px; font-size:14px; }
+    .side .active { background:#e7f3ff; border-left:4px solid var(--blue); color:#064b83; font-weight:700; }
+    .main { flex:1; padding:26px 32px; overflow:hidden; position:relative; }
+    .crumb { color:#4d6475; font-size:13px; margin-bottom:12px; }
+    h1 { font-size:27px; margin:0 0 8px; }
+    h2 { font-size:20px; margin:0 0 15px; }
+    .lead { color:var(--muted); margin:0 0 20px; }
+    .card { border:1px solid var(--line); border-radius:8px; background:white; margin:15px 0; overflow:hidden; box-shadow:0 1px 1px #00000008; }
+    .card-title { padding:14px 18px; border-bottom:1px solid var(--line); font-size:17px; font-weight:700; background:#fafafa; }
+    .card-body { padding:18px; }
+    .toolbar { display:flex; align-items:center; gap:10px; margin:16px 0; }
+    .btn { padding:9px 15px; border:1px solid #8d9096; background:white; border-radius:20px; font-weight:700; font-size:13px; }
+    .btn.primary { background:var(--orange); border-color:#e07800; color:#111; }
+    .btn.blue { background:var(--blue); border-color:var(--blue); color:white; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th { text-align:left; background:#f7f8f8; padding:12px 10px; border:1px solid var(--line); }
+    td { padding:12px 10px; border:1px solid var(--line); }
+    .link { color:var(--blue); font-weight:600; }
+    .pill { display:inline-block; padding:4px 9px; border-radius:14px; font-size:12px; font-weight:700; background:#e8f5e9; color:#1b5e20; }
+    .success { padding:12px 16px; border-left:5px solid var(--green); background:#f0fff1; margin:14px 0; color:#135d19; }
+    .info { padding:12px 16px; border-left:5px solid var(--blue); background:#f1f8ff; margin:14px 0; }
+    .kv { display:grid; grid-template-columns:210px 1fr; gap:0; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+    .kv div { padding:11px 14px; border-bottom:1px solid var(--line); }
+    .kv div:nth-child(odd) { background:#f7f8f8; font-weight:700; }
+    .code { background:#0f1720; color:#d4e6f1; font:13px Consolas,monospace; padding:17px; border-radius:6px; white-space:pre-wrap; line-height:1.48; }
+    .log { background:#0c1521; color:#d6e2ef; font:12.5px Consolas,monospace; padding:17px; height:500px; overflow:hidden; line-height:1.52; }
+    .log .ok { color:#67e480; } .log .key { color:#6ec7ff; } .log .warn { color:#ffd166; }
+    .diagram { display:flex; justify-content:center; align-items:center; gap:18px; padding:24px 8px; }
+    .node { min-width:155px; padding:18px 12px; border:2px solid #9ba7b4; border-radius:10px; text-align:center; background:#fff; font-weight:700; }
+    .node.active { border-color:var(--orange); box-shadow:0 0 0 4px #fff2d5; }
+    .arrow { font-size:28px; color:#64748b; }
+    .window { background:#eef2f6; width:100%; height:100%; padding-top:44px; }
+    .winbar { position:absolute; left:0; right:0; top:0; height:44px; color:white; background:#202124; padding:11px 18px; font-size:14px; }
+    .explorer { display:flex; margin:24px auto; width:1180px; height:735px; background:white; border:1px solid #aeb6c0; box-shadow:0 8px 28px #0003; }
+    .folders { width:220px; background:#f5f6f7; border-right:1px solid #ddd; padding:22px; line-height:2.25; color:#344054; }
+    .filemain { flex:1; padding:26px; }
+    .preview { display:flex; gap:30px; align-items:flex-start; }
+    .preview img { max-width:620px; max-height:460px; object-fit:contain; border:1px solid #cfd5dc; background:#ddd; }
+    .properties { min-width:260px; border:1px solid #d5d9dd; border-radius:6px; overflow:hidden; }
+    .properties h3 { margin:0; padding:14px; background:#f0f2f4; }
+    .properties p { margin:0; padding:10px 14px; border-top:1px solid #e2e4e7; }
+    .compare { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
+    .compare figure { margin:0; border:1px solid var(--line); padding:14px; border-radius:8px; background:#fafafa; }
+    .compare img { width:100%; height:360px; object-fit:contain; background:#e8edf2; }
+    .compare figcaption { font-weight:700; text-align:center; margin-top:12px; }
+    .badge { display:inline-flex; align-items:center; padding:6px 10px; background:#eef7ff; color:#075985; border-radius:4px; font-weight:700; font-size:13px; }
+    .footer-note { position:absolute; bottom:15px; right:25px; color:#6b7280; font-size:11px; }
+  </style>
+</head>
+<body>
+  <div class="watermark">SIMULACIÓN ACADÉMICA · SIN AWS REAL</div>
+  <div id="app"></div>
+  <script>
+    const capture = Number(new URLSearchParams(location.search).get('capture') || 1);
+    const app = document.getElementById('app');
+    const bucket = 'umg-serverless-images-demo-jguerra';
+    const lambda = 'umg-image-resizer';
+
+    function awsShell(service, section, title, content) {
+      app.innerHTML = `<div class="top"><div class="aws">aws<i></i></div><div class="services">Services</div><div class="search">Search AWS services and resources</div><div class="region">N. Virginia</div><div class="account">Academic demo</div></div>
+      <div class="subnav"><b>${service}</b><span>Resource groups</span><span>Documentation</span><span>Support</span></div>
+      <div class="layout"><aside class="side"><h3>${service}</h3><div>Dashboard</div><div class="active">${section}</div><div>Access management</div><div>Settings</div></aside><main class="main"><div class="crumb">${service} › ${section}</div><h1>${title}</h1>${content}<div class="footer-note">Interfaz recreada con datos ficticios para fines académicos</div></main></div>`;
+    }
+
+    function explorer(title, image, props, subtitle='Evidencia local') {
+      app.innerHTML = `<div class="window"><div class="winbar">File Explorer · ${subtitle}</div><div class="explorer"><div class="folders"><b>Home</b><br>Desktop<br>Documents<br>Downloads<br><b>Proyecto serverless</b><br>evidence<br>originals<br>results</div><div class="filemain"><h1>${title}</h1><p class="lead">Archivo utilizado por la prueba reproducible con Sharp.</p><div class="preview"><img src="${image}"><div class="properties"><h3>Properties</h3>${props.map(p=>`<p><b>${p[0]}:</b><br>${p[1]}</p>`).join('')}</div></div></div></div></div>`;
+    }
+
+    const views = {
+      1: () => explorer('prueba-serverless.jpg', '../originals/prueba-serverless.jpg', [['Type','JPEG image'],['Dimensions','1600 × 900 pixels'],['Size','82,831 bytes'],['Location','evidence/originals']]),
+      2: () => awsShell('Amazon S3','General purpose buckets','Buckets', `<p class="lead">Object storage resources in US East (N. Virginia).</p><div class="toolbar"><button class="btn">Refresh</button><button class="btn primary">Create bucket</button></div><div class="card"><table><tr><th>Bucket name</th><th>AWS Region</th><th>Access</th><th>Creation date</th></tr><tr><td class="link">${bucket}</td><td>US East (N. Virginia) us-east-1</td><td>Objects can be public: No</td><td>September 4, 2026</td></tr></table></div>`),
+      3: () => awsShell('Amazon S3','Objects',bucket, `<div class="crumb">Amazon S3 › Buckets › ${bucket}</div><div class="toolbar"><button class="btn">Copy S3 URI</button><button class="btn">Download</button><button class="btn primary">Upload</button></div><div class="card"><div class="card-title">Objects (2)</div><table><tr><th>Name</th><th>Type</th><th>Last modified</th><th>Size</th></tr><tr><td class="link">📁 originals/</td><td>Folder</td><td>—</td><td>—</td></tr><tr><td class="link">📁 resized/</td><td>Folder</td><td>—</td><td>—</td></tr></table></div><div class="info"><b>Amazon S3 uses object key prefixes.</b> These folders represent the prefixes used by the event workflow.</div>`),
+      4: () => awsShell('Amazon S3','Objects','originals/', `<div class="crumb">Amazon S3 › Buckets › ${bucket} › originals/</div><div class="success"><b>Upload succeeded.</b> 1 object was uploaded.</div><div class="toolbar"><button class="btn">Refresh</button><button class="btn primary">Upload</button></div><div class="card"><table><tr><th>Name</th><th>Type</th><th>Last modified</th><th>Size</th><th>Storage class</th></tr><tr><td class="link">prueba-serverless.jpg</td><td>jpg</td><td>September 4, 2026, 20:15:02</td><td>82.0 KB</td><td>Standard</td></tr></table></div>`),
+      5: () => awsShell('AWS Lambda','Functions',lambda, `<span class="pill">Active</span><p class="lead">Serverless image processing function.</p><div class="diagram"><div class="node active">Amazon S3<br><small>${bucket}</small></div><div class="arrow">→</div><div class="node active">AWS Lambda<br><small>${lambda}</small></div><div class="arrow">→</div><div class="node">Amazon CloudWatch<br><small>Logs</small></div></div><div class="card"><div class="card-title">Function overview</div><div class="card-body"><div class="kv"><div>Runtime</div><div>Node.js 22.x</div><div>Architecture</div><div>x86_64</div><div>Handler</div><div>index.handler</div><div>Memory</div><div>1024 MB</div><div>Timeout</div><div>30 sec</div></div></div></div>`),
+      6: () => awsShell('AWS Lambda','Triggers',lambda, `<div class="card"><div class="card-title">Trigger configuration</div><div class="card-body"><div class="kv"><div>Trigger</div><div>Amazon S3</div><div>Bucket</div><div>${bucket}</div><div>Event types</div><div>All object create events (s3:ObjectCreated:*)</div><div>Prefix</div><div><span class="badge">originals/</span></div><div>Suffix</div><div>Not configured</div><div>Status</div><div><span class="pill">Enabled</span></div></div></div></div><div class="success">Amazon S3 can invoke <b>${lambda}</b> when an object is created under <b>originals/</b>.</div>`),
+      7: () => awsShell('Amazon S3','Event notifications','image-upload-event', `<div class="card"><div class="card-title">General configuration</div><div class="card-body"><label><b>Event name</b></label><div class="info">image-upload-event</div><label><b>Prefix — optional</b></label><div style="border:3px solid #0972d3;border-radius:6px;padding:16px;margin:8px 0 18px;font-size:23px;font-family:Consolas">originals/</div><label><b>Suffix — optional</b></label><div style="border:1px solid #8d9096;border-radius:4px;padding:14px;color:#7a838c">No suffix configured</div></div></div><div class="success"><b>Loop prevention:</b> objects saved under resized/ do not match this prefix.</div>`),
+      8: () => awsShell('AWS Lambda','Environment variables',lambda, `<div class="toolbar"><button class="btn">Edit</button></div><div class="card"><div class="card-title">Environment variables (2)</div><table><tr><th>Key</th><th>Value</th></tr><tr><td><b>IMAGE_HEIGHT</b></td><td>600</td></tr><tr><td><b>IMAGE_WIDTH</b></td><td>800</td></tr></table></div><div class="info">The code reads these values through <code>process.env.IMAGE_WIDTH</code> and <code>process.env.IMAGE_HEIGHT</code>.</div>`),
+      9: () => awsShell('IAM','Roles','umg-image-resizer-role', `<p class="lead">Execution role used by AWS Lambda.</p><div class="card"><div class="card-title">Permissions policies</div><table><tr><th>Policy name</th><th>Policy type</th><th>Used as</th></tr><tr><td class="link">umg-image-resizer-policy</td><td>Customer inline</td><td>Permissions policy</td></tr></table></div><div class="card"><div class="card-title">Trust relationship</div><div class="card-body"><div class="code">{
+  "Effect": "Allow",
+  "Principal": { "Service": "lambda.amazonaws.com" },
+  "Action": "sts:AssumeRole"
+}</div></div></div>`),
+      10: () => awsShell('IAM','Policies','umg-image-resizer-policy', `<div class="card"><div class="card-title">JSON policy document</div><div class="card-body"><div class="code">{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${bucket}/originals/*" },
+    { "Effect": "Allow", "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${bucket}/resized/*" },
+    { "Effect": "Allow", "Action": "logs:CreateLogGroup",
+      "Resource": "arn:aws:logs:*:*:*" },
+    { "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:*:*:log-group:/aws/lambda/${lambda}:*" }
+  ]
+}</div></div></div>`),
+      11: () => awsShell('Amazon CloudWatch','Log groups',`/aws/lambda/${lambda}`, `<p class="lead">Log stream 2026/09/04/[$LATEST]academic-demo</p><div class="log"><span class="key">2026-09-04T20:15:03.112Z</span> START RequestId: demo-7b82 Version: $LATEST
+<span class="ok">2026-09-04T20:15:03.118Z Inicio de ejecución de umg-image-resizer.</span> { "recordCount": 1 }
+2026-09-04T20:15:03.120Z Registro S3 recibido. { "bucket": "${bucket}",
+  "originalKey": "originals/prueba-serverless.jpg", "eventName": "ObjectCreated:Put" }
+2026-09-04T20:15:03.121Z Configuración de procesamiento. { "expectedContentType": "image/jpeg",
+  <span class="warn">"width": 800, "height": 600</span>, "outputKey": "resized/prueba-serverless-resized.jpg" }
+<span class="ok">2026-09-04T20:15:03.282Z Descarga desde S3 confirmada.</span> { "bytes": 82831,
+  "declaredContentType": "image/jpeg" }
+<span class="ok">2026-09-04T20:15:03.491Z Procesamiento con Sharp confirmado.</span> {
+  "detectedContentType": "image/jpeg", "sourceDimensions": "1600x900",
+  <span class="warn">"outputDimensions": "800x450"</span>, "outputBytes": 21041 }
+<span class="ok">2026-09-04T20:15:03.598Z Guardado en S3 confirmado.</span> {
+  "outputKey": "resized/prueba-serverless-resized.jpg", "contentType": "image/jpeg" }
+2026-09-04T20:15:03.599Z Fin de ejecución. { "processed": 1, "ignored": 0, "failed": 0 }
+<span class="key">2026-09-04T20:15:03.601Z</span> END RequestId: demo-7b82
+2026-09-04T20:15:03.601Z REPORT Duration: 489.00 ms  Memory Size: 1024 MB</div>`),
+      12: () => awsShell('Amazon S3','Objects','resized/', `<div class="crumb">Amazon S3 › Buckets › ${bucket} › resized/</div><div class="toolbar"><button class="btn">Refresh</button><button class="btn">Download</button></div><div class="card"><table><tr><th>Name</th><th>Type</th><th>Last modified</th><th>Size</th><th>Storage class</th></tr><tr><td class="link">prueba-serverless-resized.jpg</td><td>jpg</td><td>September 4, 2026, 20:15:03</td><td>20.8 KB</td><td>Standard</td></tr></table></div><div class="success">The deterministic output key confirms the idempotent naming strategy.</div>`),
+      13: () => explorer('prueba-serverless-resized.jpg', '../results/prueba-serverless-resized.jpg', [['Type','JPEG image'],['Dimensions','800 × 450 pixels'],['Size','21,041 bytes'],['Content-Type','image/jpeg']], 'Resultado real producido localmente por Sharp'),
+      14: () => explorer('Dimensiones originales', '../originals/prueba-serverless.jpg', [['File','prueba-serverless.jpg'],['Width','1600 pixels'],['Height','900 pixels'],['Aspect ratio','16:9'],['Size','82,831 bytes']], 'Propiedades de la entrada'),
+      15: () => explorer('Dimensiones nuevas', '../results/prueba-serverless-resized.jpg', [['File','prueba-serverless-resized.jpg'],['Width','800 pixels'],['Height','450 pixels'],['Aspect ratio','16:9'],['Size','21,041 bytes']], 'Propiedades del resultado real de Sharp'),
+      16: () => { app.innerHTML = `<div class="window"><div class="winbar">Comparación verificable · Procesamiento local real con Sharp</div><main style="padding:62px 70px 30px"><h1>Original y procesada</h1><p class="lead">La salida conserva formato JPEG y relación de aspecto 16:9.</p><div class="compare"><figure><img src="../originals/prueba-serverless.jpg"><figcaption>Original · 1600 × 900 · 82,831 bytes</figcaption></figure><figure><img src="../results/prueba-serverless-resized.jpg"><figcaption>Procesada · 800 × 450 · 21,041 bytes</figcaption></figure></div><div class="success"><b>Verificación real de Sharp:</b> el ancho se redujo 50 %, la altura se ajustó proporcionalmente y el original permanece separado.</div></main></div>`; }
+    };
+    (views[capture] || views[1])();
+  </script>
+</body>
+</html>

@@ -2,6 +2,16 @@
 
 Proyecto académico completo que redimensiona automáticamente imágenes JPEG y PNG al cargarlas en Amazon S3. S3 publica un evento, AWS Lambda ejecuta código TypeScript compilado para Node.js y Sharp genera una versión ajustada dentro del mismo bucket. No se requiere invocar la función manualmente en el flujo normal.
 
+## Informe académico con evidencias simuladas
+
+Se incluye [docs/informe-academico-simulado.pdf](docs/informe-academico-simulado.pdf), un informe de 30 páginas con 16 capturas recreadas. Las pantallas de S3, Lambda, IAM y CloudWatch están marcadas explícitamente como **simulaciones sin ejecución en AWS**; las imágenes y mediciones de Sharp sí se generaron mediante una ejecución local real.
+
+Para regenerar imágenes, capturas y PDF en Windows con Microsoft Edge:
+
+```powershell
+npm run evidence:report
+```
+
 ## 1. Descripción y objetivo
 
 El objetivo es demostrar una arquitectura serverless orientada a eventos, segura, observable e idempotente. El usuario conserva el archivo original en `originals/`; Lambda crea una copia relacionada en `resized/` sin administrar servidores.
