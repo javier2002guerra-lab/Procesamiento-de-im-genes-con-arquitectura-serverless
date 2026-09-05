@@ -1,4 +1,4 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import sharp from "sharp";
 
 await mkdir("evidence/originals", { recursive: true });
@@ -23,8 +23,8 @@ const pngSvg = `<svg width="1200" height="1600" xmlns="http://www.w3.org/2000/sv
 const jpegOriginal = await sharp(Buffer.from(jpegSvg)).jpeg({ quality: 92 }).toBuffer();
 const pngOriginal = await sharp(Buffer.from(pngSvg)).png().toBuffer();
 
-await sharp(jpegOriginal).toFile("evidence/originals/prueba-serverless.jpg");
-await sharp(pngOriginal).toFile("evidence/originals/prueba-serverless.png");
+await writeFile("evidence/originals/prueba-serverless.jpg", jpegOriginal);
+await writeFile("evidence/originals/prueba-serverless.png", pngOriginal);
 
 const jpegResult = await sharp(jpegOriginal)
   .resize({ width: 800, height: 600, fit: "inside", withoutEnlargement: true })
@@ -33,8 +33,8 @@ const pngResult = await sharp(pngOriginal)
   .resize({ width: 800, height: 600, fit: "inside", withoutEnlargement: true })
   .toBuffer();
 
-await sharp(jpegResult).toFile("evidence/results/prueba-serverless-resized.jpg");
-await sharp(pngResult).toFile("evidence/results/prueba-serverless-resized.png");
+await writeFile("evidence/results/prueba-serverless-resized.jpg", jpegResult);
+await writeFile("evidence/results/prueba-serverless-resized.png", pngResult);
 
 for (const [label, buffer] of [
   ["JPEG original", jpegOriginal],
